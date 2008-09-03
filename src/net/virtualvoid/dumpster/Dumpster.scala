@@ -97,8 +97,8 @@ class MyHandler extends org.mortbay.jetty.handler.AbstractHandler{
       
       XML.write(res.getWriter,propfind(input \ "prop" \ "_" ,resource,depth),"utf-8",true,null)
     }
-    case _ =>
-      r.setHandled(false)
+    case m@_ =>
+      res.sendError(405,m+" not implemented")
     }
   }
 }
