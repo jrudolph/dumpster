@@ -29,7 +29,7 @@ class FileResource(file:java.io.File) extends Resource{
     case <getlastmodified/> => easy(httpDate(file.lastModified))
     case <getcontentlength/> => easy(file.length.toString)
     case <resourcetype/> => {
-      if (file.isDirectory) easyNode(<D:collection/>) else easy("")
+      if (file.isDirectory) easyNode(<D:collection/>) else Some(prop)
     }
     case _ => super.property(prop)
     }
