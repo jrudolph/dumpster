@@ -97,6 +97,14 @@ class MyHandler extends org.mortbay.jetty.handler.AbstractHandler{
       
       XML.write(res.getWriter,propfind(input \ "prop" \ "_" ,resource,depth),"utf-8",true,null)
     }
+    case "HEAD" => {
+      res.setContentLength(file.length.intValue)
+    }
+    case "GET" => {
+      res.setContentLength(file.length.intValue)
+      import org.mortbay.util.IO;
+      IO.copy(new java.io.FileInputStream(file),res.getOutputStream)
+    }
     case m@_ =>
       res.sendError(405,m+" not implemented")
     }
