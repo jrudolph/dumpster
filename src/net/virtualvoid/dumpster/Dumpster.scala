@@ -43,11 +43,7 @@ class MyHandler extends org.mortbay.jetty.handler.AbstractHandler{
   import org.mortbay.jetty.Request
   import scala.xml._
   
-  def propfind(props:NodeSeq,target:String,depth:String) = {
-    val file = new java.io.File("." + target)
-    //System.out.println(file.getAbsolutePath+" "+file.isDirectory)
-    val res:Resource = new FileResource(file)
-
+  def propfind(props:NodeSeq,res:Resource,depth:String) = {
     val resources:Seq[Resource] = depth match {
     case "0" => res::Nil
     case "1" => res.children ++ (res :: Nil)
@@ -75,6 +71,14 @@ class MyHandler extends org.mortbay.jetty.handler.AbstractHandler{
   }
   
   def handle(target:String,req:HttpServletRequest,res:HttpServletResponse,dispatch:int){
+    val file = new java.io.File("." + target)
+    if (!file.exists){
+      System.out.println("Does not exist:"+file.getAbsolutePath)
+      res.sendError(404,"Not found!")
+      return
+    }
+    val resource:Resource = new FileResource(file)
+    
     val r:Request = req.asInstanceOf[Request]
     r.setHandled(true)
     req.getMethod match {
@@ -91,7 +95,7 @@ class MyHandler extends org.mortbay.jetty.handler.AbstractHandler{
       
       val input = XML.load(req.getInputStream)
       
-      XML.write(res.getWriter,propfind(input \ "prop" \ "_" ,target,depth),"utf-8",true,null)
+      XML.write(res.getWriter,propfind(input \ "prop" \ "_" ,resource,depth),"utf-8",true,null)
     }
     case _ =>
       r.setHandled(false)
